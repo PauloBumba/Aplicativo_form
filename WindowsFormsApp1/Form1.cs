@@ -15,51 +15,83 @@ namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
-       private MySqlConnection conexão;
-       private  string data_sorce = $"server=localhost; uid=root;database=db_agenda;password=;";
+        // Declaração de uma variável de conexão MySQL
+        private MySqlConnection conexão;
+        // String de conexão com o banco de dados MySQL
 
+        private string data_sorce = $"server=localhost; uid=root;database=db_agenda;password=root;";
+
+        // Variável para armazenar o ID do contato selecionado
         private int? id_contato = null;
+
         public Form1()
         {
             InitializeComponent();
-            list_Contato.View=View.Details;
+            CarregarContatos(); // Carregar contatos do banco de dados ao iniciar
+            list_Contato.View = View.Details;
             list_Contato.LabelEdit = true;
             list_Contato.AllowColumnReorder = true;
             list_Contato.FullRowSelect = true;
             list_Contato.GridLines = true;
 
+            // Adicionar colunas ao ListView
             list_Contato.Columns.Add("Id", 30, HorizontalAlignment.Left);
             list_Contato.Columns.Add("Nome", 150, HorizontalAlignment.Left);
             list_Contato.Columns.Add("Email", 150, HorizontalAlignment.Left);
             list_Contato.Columns.Add("Telefone", 150, HorizontalAlignment.Left);
-
         }
 
-
-        private void label3_Click(object sender, EventArgs e)
+        // Método para carregar contatos do banco de dados e exibir no ListView
+        private void CarregarContatos()
         {
+            try
+            {
+                MySqlConnection conexao = new MySqlConnection(data_sorce);
+                conexao.Open();
 
+                // Consulta SQL para buscar todos os contatos
+                string consultaSql = "SELECT * FROM contato";
+                MySqlCommand comando = new MySqlCommand(consultaSql, conexao);
+
+                MySqlDataReader reader = comando.ExecuteReader();
+                list_Contato.Items.Clear();
+
+                // Ler dados do banco de dados e adicionar ao ListView
+                while (reader.Read())
+                {
+                    string[] row =
+                    {
+                        reader.GetInt32(0).ToString(), // ID
+                        reader.GetString(1), // Nome
+                        reader.GetString(2), // Email
+                        reader.GetString(3) // Telefone
+                    };
+
+                    var linha_listview = new ListViewItem(row);
+                    list_Contato.Items.Add(linha_listview);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro: {ex.Message}");
+            }
         }
 
-        private void textBox3_TextChanged(object sender, EventArgs e)
-        {
+        private void label3_Click(object sender, EventArgs e) { }
 
-        }
+        private void textBox3_TextChanged(object sender, EventArgs e) { }
 
+        // Método para inserir ou atualizar um contato no banco de dados
         private void button1_Click(object sender, EventArgs e)
         {
             try
             {
-                
-
                 MySqlConnection conexao = new MySqlConnection(data_sorce);
+
                 if (id_contato == null)
                 {
-
-                    // Montar a consulta SQL para inserção
+                    // Inserir novo contato
                     string consultaSql = "INSERT INTO contato (nome, email, telefone) VALUES (@nome, @email, @telefone)";
-
-
                     MySqlCommand comando = new MySqlCommand(consultaSql, conexao);
 
                     string nome = textNome.Text.Trim();
@@ -75,7 +107,6 @@ namespace WindowsFormsApp1
                     if (linhasAfetadas > 0)
                     {
                         MessageBox.Show("Valores inseridos com sucesso!");
-
                     }
                     else
                     {
@@ -84,16 +115,16 @@ namespace WindowsFormsApp1
                 }
                 else
                 {
+                    // Atualizar contato existente
                     try
                     {
-                        
                         string consultaSql = "UPDATE contato SET nome = @nome, email = @email, telefone = @telefone WHERE id = @id;";
                         MySqlCommand comando = new MySqlCommand(consultaSql, conexao);
-                        
+
                         string nome = textNome.Text.Trim();
                         string email = textEmail.Text.Trim();
                         string telefone = textTelefone.Text.Trim();
-                        if(string.IsNullOrEmpty(nome) || string.IsNullOrEmpty(email)  || string.IsNullOrEmpty(telefone))
+                        if (string.IsNullOrEmpty(nome) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(telefone))
                         {
                             MessageBox.Show("Uns dos Campos esta vazio");
                         }
@@ -109,6 +140,7 @@ namespace WindowsFormsApp1
                         if (linhasAfetadas > 0)
                         {
                             MessageBox.Show("Valores atualizados com sucesso!");
+                            CarregarContatos(); // Recarregar contatos após atualização
                         }
                         else
                         {
@@ -119,64 +151,50 @@ namespace WindowsFormsApp1
                     {
                         MessageBox.Show($"Erro: {ex.Message}");
                     }
-
                 }
-
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-
             }
-            finally 
-            { 
+            finally
+            {
                 textNome.Clear();
                 textEmail.Clear();
                 textTelefone.Clear();
-                
+                CarregarContatos(); // Recarregar contatos após inserção ou atualização
             }
-
         }
 
-        private void label2_Click(object sender, EventArgs e)
-        {
+        private void label2_Click(object sender, EventArgs e) { }
 
-        }
+        private void label1_Click(object sender, EventArgs e) { }
 
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        // Método para buscar contatos no banco de dados pelo nome ou email
         private void button2_Click(object sender, EventArgs e)
         {
-
             try
             {
                 MySqlConnection conexao = new MySqlConnection(data_sorce);
                 conexao.Open();
-                
+
                 string consultaSql = "SELECT * FROM contato WHERE nome LIKE  @q OR email LIKE @q";
-                
-
                 MySqlCommand comando = new MySqlCommand(consultaSql, conexao);
-               
-                
-
-                comando.Parameters.AddWithValue("@q","%" + textBuscar.Text + "%");
+                comando.Parameters.AddWithValue("@q", "%" + textBuscar.Text + "%");
 
                 MySqlDataReader reader = comando.ExecuteReader();
                 list_Contato.Items.Clear();
 
+                // Ler dados do banco de dados e adicionar ao ListView
                 while (reader.Read())
                 {
                     string[] row =
                     {
-                                        reader.GetInt32(0).ToString(), // ID (assumindo que é um campo inteiro)
-                                        reader.GetString(1), // Nome
-                                        reader.GetString(2), // Email
-                                        reader.GetString(3) // Outro campo (ajuste conforme necessário)
-                     };
+                        reader.GetInt32(0).ToString(), // ID
+                        reader.GetString(1), // Nome
+                        reader.GetString(2), // Email
+                        reader.GetString(3) // Telefone
+                    };
 
                     var linha_listview = new ListViewItem(row);
                     list_Contato.Items.Add(linha_listview);
@@ -186,74 +204,65 @@ namespace WindowsFormsApp1
             {
                 MessageBox.Show($"Erro: {ex.Message}");
             }
-
-
-
-
-
-
-        }
-        private void textBuscar_TextChanged(object sender, EventArgs e)
-        { 
-        
-                
-            
         }
 
+        private void textBuscar_TextChanged(object sender, EventArgs e) { }
+
+        // Método para carregar dados do contato selecionado no ListView para os campos de texto
         private void list_Contato_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
             ListView.SelectedListViewItemCollection itens_selecionados = list_Contato.SelectedItems;
 
-            foreach(ListViewItem item in itens_selecionados)
-
+            foreach (ListViewItem item in itens_selecionados)
             {
-                id_contato =Convert.ToInt32(item.SubItems[0].Text);
+                id_contato = Convert.ToInt32(item.SubItems[0].Text);
                 textNome.Text = item.SubItems[1].Text;
                 textEmail.Text = item.SubItems[2].Text;
                 textTelefone.Text = item.SubItems[3].Text;
             }
         }
 
+        // Método para excluir um contato do banco de dados
         private void button3_Click(object sender, EventArgs e)
         {
-            
-                try
+            try
+            {
+                if (id_contato != null)
                 {
-                    if (id_contato != null)
+                    MySqlConnection conexao = new MySqlConnection(data_sorce);
+                    string consultaSql = "DELETE FROM contato WHERE id = @id;";
+                    MySqlCommand comando = new MySqlCommand(consultaSql, conexao);
+                    comando.Parameters.AddWithValue("@id", id_contato);
+                    conexao.Open();
+                    int linhasAfetadas = comando.ExecuteNonQuery();
+                    if (linhasAfetadas > 0)
                     {
-                        MySqlConnection conexao = new MySqlConnection(data_sorce);
-                        string consultaSql = "DELETE FROM contato WHERE id = @id;";
-                        MySqlCommand comando = new MySqlCommand(consultaSql, conexao);
-                        comando.Parameters.AddWithValue("@id", id_contato);
-                        conexao.Open();
-                        int linhasAfetadas = comando.ExecuteNonQuery();
-                        if (linhasAfetadas > 0)
-                        {
-                            MessageBox.Show("Contato excluído com sucesso!");
-                        }
-                        else
-                        {
-                            MessageBox.Show("Nenhum contato foi excluído. Verifique os dados e tente novamente.");
-                        }
+                        MessageBox.Show("Contato excluído com sucesso!");
                     }
                     else
                     {
-                        MessageBox.Show("Por favor, selecione um contato para excluir.");
+                        MessageBox.Show("Nenhum contato foi excluído. Verifique os dados e tente novamente.");
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show($"Erro: {ex.Message}");
-                }
-                finally
-                {
-                    textNome.Clear();
-                    textEmail.Clear();
-                    textTelefone.Clear();
-                    id_contato = null;
+                    MessageBox.Show("Por favor, selecione um contato para excluir.");
                 }
             }
-
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro: {ex.Message}");
+            }
+            finally
+            {
+                textNome.Clear();
+                textEmail.Clear();
+                textTelefone.Clear();
+                CarregarContatos(); // Recarregar contatos após exclusão
+                id_contato = null;
+            }
         }
-    }
 
+        private void textEmail_TextChanged(object sender, EventArgs e) { }
+    }
+}

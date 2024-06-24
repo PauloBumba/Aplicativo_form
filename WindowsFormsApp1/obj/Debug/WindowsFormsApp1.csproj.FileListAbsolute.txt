@@ -40,3 +40,6 @@ C:\Users\paulo\OneDrive\Desktop\Aplicativo_form\WindowsFormsApp1\obj\Debug\Windo
 C:\Users\paulo\OneDrive\Desktop\Aplicativo_form\WindowsFormsApp1\obj\Debug\WindowsF.A1EEDF9B.Up2Date
 C:\Users\paulo\OneDrive\Desktop\Aplicativo_form\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.exe
 C:\Users\paulo\OneDrive\Desktop\Aplicativo_form\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.pdb
+C:\Users\paulo\OneDrive\Desktop\windowsForm\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.csproj.AssemblyReference.cache
+C:\Users\paulo\OneDrive\Desktop\windowsForm\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.exe
+C:\Users\paulo\OneDrive\Desktop\windowsForm\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.pdb
