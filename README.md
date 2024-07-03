@@ -65,3 +65,7 @@ Excluir Contato:
 
 Selecione um contato na lista.
 Clique no botão "Excluir".
+
+
+
+![image](https://github.com/PauloBumba/Aplicativo_form/assets/143729787/5773314a-467e-4566-a432-b4f150482c45)
